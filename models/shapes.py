@@ -66,7 +66,7 @@ class Triangle(Shape2d):
         return 2 * self.calculate_area() / self.height
 
     def calculate_last_angle(self):
-        return (self.angle1 + self.angle2) - 180
+        return 180 - (self.angle1 + self.angle2)
 
 
 class RigthRectangle(Shape2d):
@@ -93,7 +93,7 @@ class RigthRectangle(Shape2d):
         )
 
     def calculate_last_angle(self) -> float:
-        return (RECT_ANGLE + self.angle) - 180
+        return 180 - (RECT_ANGLE + self.angle)
 
 
 class Pentagon(Shape2d):
