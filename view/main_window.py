@@ -125,8 +125,8 @@ class ShapePage(ctk.CTkFrame):
             corner_radius=10,
             width=260,
             height=44,
-            wraplength=250,  
-            justify="left",  
+            wraplength=250,
+            justify="left",
             anchor="center",
         )
         self.label_resultado.grid(row=6, column=0, sticky="w", pady=(0, 8))
@@ -186,16 +186,23 @@ class ShapePage(ctk.CTkFrame):
         validador = VALIDADORES_POR_FIGURA.get(self.nombre_figura)
         if validador:
             valido, mensaje = validador(valores_ingresados)
-        if not valido:
-            self.label_resultado.configure(text=mensaje)
-            return
+            if not valido:
+                self.label_resultado.configure(text=mensaje)
+                return
 
         try:
             resultado = ejecutar_calculo(
                 self.nombre_figura, operacion_actual, valores_ingresados
             )
+            op_lower = operacion_actual.lower()
+            if op_lower in ["area", "surface area"]:
+                unidad = "in²"
+            elif op_lower in ["volume"]:
+                unidad = "in³"
+            else:
+                unidad = "in"
             self.label_resultado.configure(
-                text=f"{operacion_actual}  =  {resultado:.4f}"
+                text=f"{operacion_actual} = {resultado:.4f} {unidad}"
             )
         except Exception as error:
             self.label_resultado.configure(text=f"Error: {error}")
