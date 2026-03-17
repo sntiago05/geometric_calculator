@@ -2,12 +2,24 @@ import tkinter as tk
 import customtkinter as ctk
 
 from view.colors import (
-    COLOR_FONDO_PRINCIPAL, COLOR_FONDO_PANEL_IZQ, COLOR_FONDO_PAGINA,
-    COLOR_ACENTO, COLOR_BOTON_INACTIVO, COLOR_BOTON_HOVER,
-    COLOR_TEXTO_PRINCIPAL, COLOR_TEXTO_SECUNDARIO, COLOR_FONDO_RESULTADO,
+    COLOR_FONDO_PRINCIPAL,
+    COLOR_FONDO_PANEL_IZQ,
+    COLOR_FONDO_PAGINA,
+    COLOR_ACENTO,
+    COLOR_BOTON_INACTIVO,
+    COLOR_BOTON_HOVER,
+    COLOR_TEXTO_PRINCIPAL,
+    COLOR_TEXTO_SECUNDARIO,
+    COLOR_FONDO_RESULTADO,
 )
-from view.shape_data import FIGURAS_DISPONIBLES, OPERACIONES_POR_FIGURA
+from view.shape_data import (
+    FIGURAS_DISPONIBLES,
+    OPERACIONES_POR_FIGURA,
+    VALIDADORES_POR_FIGURA,
+)
 from view.calculator import ejecutar_calculo, FUNCION_DIBUJO
+from utils.validators import validar_entry
+
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
@@ -20,6 +32,7 @@ class ShapePage(ctk.CTkFrame):
         super().__init__(parent, fg_color=COLOR_FONDO_PAGINA, corner_radius=15)
         self.nombre_figura = nombre_figura
         self.operaciones_disponibles = OPERACIONES_POR_FIGURA[nombre_figura]
+        self.validate_cmmd = (self.register(validar_entry), "%P")
         self.campos_activos: dict[str, ctk.CTkEntry] = {}
         self._construir_layout()
 
@@ -36,7 +49,7 @@ class ShapePage(ctk.CTkFrame):
             bg=COLOR_FONDO_PAGINA,
             highlightthickness=0,
         )
-        self.canvas_figura.grid(row=0, column=0, sticky="nsew", padx=(16,8), pady=16)
+        self.canvas_figura.grid(row=0, column=0, sticky="nsew", padx=(16, 8), pady=16)
         self.canvas_figura.bind("<Configure>", self._redibujar_figura)
 
     def _redibujar_figura(self, event=None):
@@ -46,7 +59,7 @@ class ShapePage(ctk.CTkFrame):
 
     def _construir_panel_controles(self):
         panel = ctk.CTkFrame(self, fg_color="transparent")
-        panel.grid(row=0, column=1, sticky="nsew", padx=(8,16), pady=16)
+        panel.grid(row=0, column=1, sticky="nsew", padx=(8, 16), pady=16)
         panel.grid_columnconfigure(0, weight=1)
 
         ctk.CTkLabel(
@@ -81,13 +94,13 @@ class ShapePage(ctk.CTkFrame):
         )
         self.combo_operaciones.grid(row=2, column=0, sticky="w", pady=(4, 12))
 
-        ctk.CTkFrame(
-            panel, height=1, fg_color=COLOR_ACENTO
-        ).grid(row=3, column=0, sticky="ew", pady=(0, 12))
+        ctk.CTkFrame(panel, height=1, fg_color=COLOR_ACENTO).grid(
+            row=3, column=0, sticky="ew", pady=(0, 12)
+        )
 
         # Rebuilt every time the operation changes
         self.frame_campos = ctk.CTkFrame(panel, fg_color="transparent")
-        self.frame_campos.grid(row=4, column=0, sticky="ew")
+        self.frame_campos.grid(row=4, column=0, sticky="nsew", pady=20)
         self.frame_campos.grid_columnconfigure(1, weight=1)
 
         ctk.CTkButton(
@@ -101,7 +114,7 @@ class ShapePage(ctk.CTkFrame):
             corner_radius=10,
             height=40,
             cursor="hand2",
-        ).grid(row=5, column=0, sticky="w", pady=(16, 10))
+        ).grid(row=5, column=0, sticky="ew", pady=(16, 10))
 
         self.label_resultado = ctk.CTkLabel(
             panel,
@@ -112,6 +125,8 @@ class ShapePage(ctk.CTkFrame):
             corner_radius=10,
             width=260,
             height=44,
+            wraplength=250,  
+            justify="left",  
             anchor="center",
         )
         self.label_resultado.grid(row=6, column=0, sticky="w", pady=(0, 8))
@@ -145,9 +160,12 @@ class ShapePage(ctk.CTkFrame):
                 text_color=COLOR_TEXTO_PRINCIPAL,
                 placeholder_text_color=COLOR_TEXTO_SECUNDARIO,
                 height=34,
+                validate="key",
+                validatecommand=self.validate_cmmd,
             )
-            campo_entrada.grid(row=fila_idx, column=1, sticky="ew",
-                                padx=(10, 0), pady=5)
+            campo_entrada.grid(
+                row=fila_idx, column=1, sticky="ew", padx=(10, 0), pady=5
+            )
             self.campos_activos[var_name] = campo_entrada
 
         self.label_resultado.configure(text="Result will appear here")
@@ -161,11 +179,16 @@ class ShapePage(ctk.CTkFrame):
             texto_ingresado = campo_entrada.get().strip()
             try:
                 valores_ingresados[var_name] = float(texto_ingresado)
+                print(var_name)
             except ValueError:
-                self.label_resultado.configure(
-                    text=f"⚠  '{var_name}' must be a number"
-                )
+                self.label_resultado.configure(text=f"⚠  '{var_name}' must be a number")
                 return
+        validador = VALIDADORES_POR_FIGURA.get(self.nombre_figura)
+        if validador:
+            valido, mensaje = validador(valores_ingresados)
+        if not valido:
+            self.label_resultado.configure(text=mensaje)
+            return
 
         try:
             resultado = ejecutar_calculo(
@@ -207,7 +230,7 @@ class MainWindow(ctk.CTk):
             corner_radius=15,
             width=200,
         )
-        panel_nav.grid(row=0, column=0, sticky="nsew", padx=(12,6), pady=12)
+        panel_nav.grid(row=0, column=0, sticky="nsew", padx=(12, 6), pady=12)
         panel_nav.grid_propagate(False)
         panel_nav.grid_columnconfigure(0, weight=1)
 
@@ -232,12 +255,12 @@ class MainWindow(ctk.CTk):
                 cursor="hand2",
                 font=ctk.CTkFont(size=12),
             )
-            boton.grid(row=indice+1, column=0, padx=10, pady=3, sticky="ew")
+            boton.grid(row=indice + 1, column=0, padx=10, pady=3, sticky="ew")
             self.botones_nav[nombre_figura] = boton
 
     def _construir_panel_figuras(self):
         panel_figuras = ctk.CTkFrame(self, fg_color="transparent")
-        panel_figuras.grid(row=0, column=1, sticky="nsew", padx=(6,12), pady=12)
+        panel_figuras.grid(row=0, column=1, sticky="nsew", padx=(6, 12), pady=12)
         panel_figuras.grid_columnconfigure(0, weight=1)
         panel_figuras.grid_rowconfigure(0, weight=1)
 

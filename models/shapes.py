@@ -122,9 +122,9 @@ class Sphere(Shape3d):
 
 
 class Parallelepiped(Shape3d):
-    def __init__(self, lenght: float = 0, width: float = 0, height: float = 0) -> None:
+    def __init__(self, length: float = 0, width: float = 0, height: float = 0) -> None:
         super().__init__()
-        self.lenght = lenght
+        self.lenght = length
         self.width = width
         self.height = height
 

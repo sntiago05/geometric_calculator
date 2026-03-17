@@ -1,33 +1,45 @@
 from models import (
-    Rectangle, Circle, Triangle, RigthRectangle,
-    Pentagon, Sphere, Parallelepiped, Cylinder, Cone,
+    Rectangle,
+    Circle,
+    Triangle,
+    RigthRectangle,
+    Pentagon,
+    Sphere,
+    Parallelepiped,
+    Cylinder,
+    Cone,
 )
+from utils.validators import validar_triangulo, validar_triangulo_rectangulo
+
+VALIDADORES_POR_FIGURA = {
+    "Triangle": validar_triangulo,
+    "Right Triangle": validar_triangulo_rectangulo,
+}
 
 FIGURAS_DISPONIBLES = [
-    ("Rectangle",      Rectangle),
-    ("Circle",         Circle),
-    ("Triangle",       Triangle),
+    ("Rectangle", Rectangle),
+    ("Circle", Circle),
+    ("Triangle", Triangle),
     ("Right Triangle", RigthRectangle),
-    ("Pentagon",       Pentagon),
-    ("Sphere",         Sphere),
+    ("Pentagon", Pentagon),
+    ("Sphere", Sphere),
     ("Parallelepiped", Parallelepiped),
-    ("Cylinder",       Cylinder),
-    ("Cone",           Cone),
+    ("Cylinder", Cylinder),
+    ("Cone", Cone),
 ]
 
 ETIQUETA_DE_OPERACION = {
-    "area":         "Area",
-    "perimeter":    "Perimeter",
-    "base":         "Base (from area)",
-    "height":       "Height (from area)",
-    "diameter":     "Diameter",
-    "last_angle":   "Last angle",
-    "hipotenuse":   "Hypotenuse",
-    "last_leg":     "Last leg",
-    "volume":       "Volume",
+    "area": "Area",
+    "perimeter": "Perimeter",
+    "base": "Base (from area)",
+    "height": "Height (from area)",
+    "diameter": "Diameter",
+    "last_angle": "Last angle",
+    "hipotenuse": "Hypotenuse",
+    "last_leg": "Last leg",
+    "volume": "Volume",
     "surface_area": "Surface area",
 }
-
 
 
 # Maps (shape_name, internal_op) → list of (var_name, display_label).
@@ -36,66 +48,55 @@ ETIQUETA_DE_OPERACION = {
 #   means: to calculate Rectangle area, show two fields: Width and Height
 #   and pass them as Rectangle(width=..., height=...)
 CAMPOS_POR_OPERACION = {
-    
-    ("Rectangle", "area"):         [("width",  "Width"),
-                                    ("height", "Height")],
-    ("Rectangle", "perimeter"):    [("width",  "Width"),
-                                    ("height", "Height")],
-    ("Rectangle", "base"):         [("area",   "Area"),
-                                    ("height", "Height")],
-    ("Rectangle", "height"):       [("area",   "Area"),
-                                    ("width",  "Width")],
-
-    ("Circle", "area"):            [("radius", "Radius")],
-    ("Circle", "perimeter"):       [("radius", "Radius")],
-    ("Circle", "diameter"):        [("radius", "Radius")],
-    # 
-    ("Triangle", "area"):          [("base",   "Base"),
-                                    ("height", "Height")],
-    ("Triangle", "perimeter"):     [("a",      "Side a"),
-                                    ("b",      "Side b"),
-                                    ("c",      "Side c")],
-    ("Triangle", "last_angle"):    [("angle1", "Angle 1"),
-                                    ("angle2", "Angle 2")],
-    # 
-    ("Right Triangle", "area"):       [("adjacent",  "Adjacent"),
-                                       ("opposite",  "Opposite")],
-    ("Right Triangle", "perimeter"):  [("adjacent",  "Adjacent"),
-                                       ("opposite",  "Opposite"),
-                                       ("hipotenuse","Hypotenuse")],
-    ("Right Triangle", "hipotenuse"): [("adjacent",  "Adjacent"),
-                                       ("opposite",  "Opposite")],
-    ("Right Triangle", "last_angle"): [("angle",     "Known angle")],
-    # 
-    ("Pentagon", "area"):          [("side", "Side")],
-    ("Pentagon", "perimeter"):     [("side", "Side")],
-    # 
-    ("Sphere", "volume"):          [("radius", "Radius")],
-    ("Sphere", "surface_area"):    [("radius", "Radius")],
+    ("Rectangle", "area"): [("width", "Width"), ("height", "Height")],
+    ("Rectangle", "perimeter"): [("width", "Width"), ("height", "Height")],
+    ("Rectangle", "base"): [("area", "Area"), ("height", "Height")],
+    ("Rectangle", "height"): [("area", "Area"), ("width", "Width")],
+    ("Circle", "area"): [("radius", "Radius")],
+    ("Circle", "perimeter"): [("radius", "Radius")],
+    ("Circle", "diameter"): [("radius", "Radius")],
     #
-    ("Parallelepiped", "volume"):       [("length", "Length"),
-                                         ("width",  "Width"),
-                                         ("height", "Height")],
-    ("Parallelepiped", "surface_area"): [("length", "Length"),
-                                         ("width",  "Width"),
-                                         ("height", "Height")],
+    ("Triangle", "area"): [("base", "Base"), ("height", "Height")],
+    ("Triangle", "perimeter"): [("a", "Side a"), ("b", "Side b"), ("c", "Side c")],
+    ("Triangle", "last_angle"): [("angle1", "Angle 1"), ("angle2", "Angle 2")],
     #
-    ("Cylinder", "volume"):        [("radius", "Radius"),
-                                    ("height", "Height")],
-    ("Cylinder", "surface_area"):  [("radius", "Radius"),
-                                    ("height", "Height")],
-    # 
-    ("Cone", "volume"):            [("radius", "Radius"),
-                                    ("height", "Height")],
-    ("Cone", "surface_area"):      [("radius", "Radius"),
-                                    ("height", "Height")],
+    ("Right Triangle", "area"): [("adjacent", "Adjacent"), ("opposite", "Opposite")],
+    ("Right Triangle", "perimeter"): [
+        ("adjacent", "Adjacent"),
+        ("opposite", "Opposite"),
+        ("hipotenuse", "Hypotenuse"),
+    ],
+    ("Right Triangle", "hipotenuse"): [
+        ("adjacent", "Adjacent"),
+        ("opposite", "Opposite"),
+    ],
+    ("Right Triangle", "last_angle"): [("angle", "Known angle")],
+    #
+    ("Pentagon", "area"): [("side", "Side")],
+    ("Pentagon", "perimeter"): [("side", "Side")],
+    #
+    ("Sphere", "volume"): [("radius", "Radius")],
+    ("Sphere", "surface_area"): [("radius", "Radius")],
+    #
+    ("Parallelepiped", "volume"): [
+        ("length", "Length"),
+        ("width", "Width"),
+        ("height", "Height"),
+    ],
+    ("Parallelepiped", "surface_area"): [
+        ("length", "Length"),
+        ("width", "Width"),
+        ("height", "Height"),
+    ],
+    #
+    ("Cylinder", "volume"): [("radius", "Radius"), ("height", "Height")],
+    ("Cylinder", "surface_area"): [("radius", "Radius"), ("height", "Height")],
+    #
+    ("Cone", "volume"): [("radius", "Radius"), ("height", "Height")],
+    ("Cone", "surface_area"): [("radius", "Radius"), ("height", "Height")],
 }
 
 
-# ── OPERACIONES_POR_FIGURA ────────────────────────────────────────────────────
-# Built dynamically by combining the three dictionaries above.
-#
-# Final structure:
 # {
 #   "Rectangle": {
 #       "Area":             [("width",  "Width"), ("height", "Height")],
@@ -135,7 +136,9 @@ for nombre_figura, clase_modelo in FIGURAS_DISPONIBLES:
         # but haven't been wired up in the UI yet.
         if label_bonito and clave_campos in CAMPOS_POR_OPERACION:
             # e.g. operaciones_de_esta_figura["Area"] = [("width","Width"),("height","Height")]
-            operaciones_de_esta_figura[label_bonito] = CAMPOS_POR_OPERACION[clave_campos]
+            operaciones_de_esta_figura[label_bonito] = CAMPOS_POR_OPERACION[
+                clave_campos
+            ]
 
     # Store the completed dict for this shape
     # e.g. OPERACIONES_POR_FIGURA["Rectangle"] = {"Area": [...], "Perimeter": [...], ...}

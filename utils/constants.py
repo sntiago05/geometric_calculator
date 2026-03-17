@@ -1,5 +1,3 @@
-import math
-
-PI = math.pi
-TAN_PI_5 = math.tan(math.pi / 5)
+PI = 3.14159
+TAN_PI_5 = 0.72654252
 RECT_ANGLE = 90
